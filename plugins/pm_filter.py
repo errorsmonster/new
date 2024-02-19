@@ -47,7 +47,7 @@ SPELL_CHECK = {}
 # ENABLE_SHORTLINK = ""
 
 
-@Client.on_message(filters.group & filters.text & filters.incoming)
+@Client.on_message(filters.group | filters.private & filters.text & filters.incoming)
 async def give_filter(client, message):
     if message.chat.id != SUPPORT_CHAT_ID:
         manual = await manual_filters(client, message)
@@ -55,13 +55,13 @@ async def give_filter(client, message):
             settings = await get_settings(message.chat.id)
             try:
                 if settings['auto_ffilter']:
-                    await auto_filter(client, message)
+                   await auto_filter(client, message)
             except KeyError:
                 grpid = await active_connection(str(message.from_user.id))
                 await save_group_settings(grpid, 'auto_ffilter', True)
                 settings = await get_settings(message.chat.id)
                 if settings['auto_ffilter']:
-                    await auto_filter(client, message) 
+                   await auto_filter(client, message) 
     else: #a better logic to avoid repeated lines of code in auto_filter function
         search = message.text
         temp_files, temp_offset, total_results = await get_search_results(chat_id=message.chat.id, query=search.lower(), offset=0, filter=True)
@@ -73,21 +73,22 @@ async def give_filter(client, message):
     reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("📷 ᴊᴏɪɴ ᴏᴜʀ ᴍᴏᴠɪᴇ ɢʀᴏᴜᴘ 🎥 ", url=f"https://t.me/tamilmovies4krio4")]])
 )
 
-@Client.on_message(filters.private & filters.text & filters.incoming)
-async def pm_text(bot, message):
-    content = message.text
-    user = message.from_user.first_name
-    user_id = message.from_user.id
-    if content.startswith("/") or content.startswith("#"): return  # ignore commands and hashtags
-    if user_id in ADMINS: return # ignore admins
-    await message.reply_text(
-         text=f"<b>ʜᴇʏ {user} 😍 ,\n\nʏᴏᴜ ᴄᴀɴ'ᴛ ɢᴇᴛ ᴍᴏᴠɪᴇs ꜰʀᴏᴍ ʜᴇʀᴇ. ʀᴇǫᴜᴇsᴛ ɪᴛ ɪɴ ᴏᴜʀ <a href=https://t.me/movies_hub_official2>ᴍᴏᴠɪᴇ ɢʀᴏᴜᴘ</a> ᴏʀ ᴄʟɪᴄᴋ ʀᴇǫᴜᴇsᴛ ʜᴇʀᴇ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ 👇</b>",   
-         reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("📝 ʀᴇǫᴜᴇsᴛ ʜᴇʀᴇ ", url=f"https://t.me/movies_hub_official2")]])
-    )
-    await bot.send_message(
-        chat_id=LOG_CHANNEL,
-        text=f"<b>#𝐏𝐌_𝐌𝐒𝐆\n\nNᴀᴍᴇ : {user}\n\nID : {user_id}\n\nMᴇssᴀɢᴇ : {content}</b>"
-    )
+# @Client.on_message(filters.private & filters.text & filters.incoming)
+# async def pm_text(bot, message):
+#     content = message.text
+#     user = message.from_user.first_name
+#     user_id = message.from_user.id
+#     if content.startswith("/") or content.startswith("#"): return  # ignore commands and hashtags
+#     if user_id in ADMINS: return # ignore admins
+#     await message.reply_text(
+#          text=f"<b>ʜᴇʏ {user} 😍 ,\n\nʏᴏᴜ ᴄᴀɴ'ᴛ ɢᴇᴛ ᴍᴏᴠɪᴇs ꜰʀᴏᴍ ʜᴇʀᴇ. ʀᴇǫᴜᴇsᴛ ɪᴛ ɪɴ ᴏᴜʀ <a href=https://telegram.me/abmovierequestgroup>ᴍᴏᴠɪᴇ ɢʀᴏᴜᴘ</a> ᴏʀ ᴄʟɪᴄᴋ ʀᴇǫᴜᴇsᴛ ʜᴇʀᴇ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ 👇</b>", disable_web_page_preview=True,
+#          reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("📝 ʀᴇǫᴜᴇsᴛ ʜᴇʀᴇ ", url=f"telegram.me/abmovierequestgroup")]])
+#     )
+#     await bot.send_message(
+#         chat_id=LOG_CHANNEL,
+#         text=f"<b>#𝐏𝐌_𝐌𝐒𝐆\n\nNᴀᴍᴇ : {user}\n\nID : {user_id}\n\nMᴇssᴀɢᴇ : {content}</b>"
+#     )
+
 
 @Client.on_callback_query(filters.regex(r"^next"))
 async def next_page(bot, query):
@@ -137,8 +138,13 @@ async def next_page(bot, query):
             ]
         )
         btn.insert(0, [
-            InlineKeyboardButton("Sᴛᴀʀᴛ Bᴏᴛ", url=f"https://telegram.me/{temp.U_NAME}"),
-            InlineKeyboardButton("𝐒𝐞𝐧𝐝 𝐀𝐥𝐥", callback_data=f"sendfiles#{key}")
+            InlineKeyboardButton("🚸Hᴏᴡ Tᴏ Dᴏᴡɴʟᴏᴀᴅ🚸", url=settings['tutorial'])
+        ])
+        btn.insert(0, [
+            InlineKeyboardButton("🎬Mᴏᴠɪᴇ Sᴇᴀʀᴄʜ🔎 Gʀᴏᴜᴘ🙋", url=GRP_LNK)
+        ])
+        btn.insert(0, [
+            InlineKeyboardButton("Sᴛᴀʀᴛ Bᴏᴛ", url=f"https://telegram.me/{temp.U_NAME}")
         ])
     else:
         btn = []
@@ -150,8 +156,13 @@ async def next_page(bot, query):
             ]
         )
         btn.insert(0, [
-            InlineKeyboardButton("Sᴛᴀʀᴛ Bᴏᴛ", url=f"https://telegram.me/{temp.U_NAME}"),
-            InlineKeyboardButton("𝐒𝐞𝐧𝐝 𝐀𝐥𝐥", callback_data=f"sendfiles#{key}")
+            InlineKeyboardButton("🚸Hᴏᴡ Tᴏ Dᴏᴡɴʟᴏᴀᴅ🚸", url=settings['tutorial'])
+        ])
+        btn.insert(0, [
+            InlineKeyboardButton("🎬Mᴏᴠɪᴇ Sᴇᴀʀᴄʜ🔎 Gʀᴏᴜᴘ🙋", url=GRP_LNK)
+        ])
+        btn.insert(0, [
+            InlineKeyboardButton("Sᴛᴀʀᴛ Bᴏᴛ", url=f"https://telegram.me/{temp.U_NAME}")
         ])
     try:
         if settings['max_btn']:
@@ -366,8 +377,13 @@ async def filter_languages_cb_handler(client: Client, query: CallbackQuery):
             ]
         )
         btn.insert(0, [
-            InlineKeyboardButton("Sᴛᴀʀᴛ Bᴏᴛ", url=f"https://telegram.me/{temp.U_NAME}"),
-            InlineKeyboardButton("𝐒𝐞𝐧𝐝 𝐀𝐥𝐥", callback_data=f"sendfiles#{key}")
+            InlineKeyboardButton("🚸Hᴏᴡ Tᴏ Dᴏᴡɴʟᴏᴀᴅ🚸", url=settings['tutorial'])
+        ])
+        btn.insert(0, [
+            InlineKeyboardButton("🎬Mᴏᴠɪᴇ Sᴇᴀʀᴄʜ🔎 Gʀᴏᴜᴘ🙋", url=GRP_LNK)
+        ])
+        btn.insert(0, [
+            InlineKeyboardButton("Sᴛᴀʀᴛ Bᴏᴛ", url=f"https://telegram.me/{temp.U_NAME}")
         ])
     else:
         btn = []
@@ -379,8 +395,13 @@ async def filter_languages_cb_handler(client: Client, query: CallbackQuery):
             ]
         )
         btn.insert(0, [
-            InlineKeyboardButton("Sᴛᴀʀᴛ Bᴏᴛ", url=f"https://telegram.me/{temp.U_NAME}"),
-            InlineKeyboardButton("𝐒𝐞𝐧𝐝 𝐀𝐥𝐥", callback_data=f"sendfiles#{key}")
+            InlineKeyboardButton("🚸Hᴏᴡ Tᴏ Dᴏᴡɴʟᴏᴀᴅ🚸", url=settings['tutorial'])
+        ])
+        btn.insert(0, [
+            InlineKeyboardButton("🎬Mᴏᴠɪᴇ Sᴇᴀʀᴄʜ🔎 Gʀᴏᴜᴘ🙋", url=GRP_LNK)
+        ])
+        btn.insert(0, [
+            InlineKeyboardButton("Sᴛᴀʀᴛ Bᴏᴛ", url=f"https://telegram.me/{temp.U_NAME}")
         ])
 
     if offset != "":
@@ -545,8 +566,13 @@ async def filter_seasons_cb_handler(client: Client, query: CallbackQuery):
             for file in files
         ]
         btn.insert(0, [
-            InlineKeyboardButton("𝐒𝐞𝐧𝐝 𝐀𝐥𝐥", callback_data=f"sendfiles#{key}"),
-            InlineKeyboardButton("Sᴇʟᴇᴄᴛ ᴀɢᴀɪɴ", callback_data=f"seasons#{key}")
+            InlineKeyboardButton("🚸Hᴏᴡ Tᴏ Dᴏᴡɴʟᴏᴀᴅ🚸", url=settings['tutorial'])
+        ])
+        btn.insert(0, [
+            InlineKeyboardButton("🎬Mᴏᴠɪᴇ Sᴇᴀʀᴄʜ🔎 Gʀᴏᴜᴘ🙋", url=GRP_LNK)
+        ])
+        btn.insert(0, [
+            InlineKeyboardButton("Sᴛᴀʀᴛ Bᴏᴛ", url=f"https://telegram.me/{temp.U_NAME}")
         ])
     else:
         btn = []
@@ -558,8 +584,13 @@ async def filter_seasons_cb_handler(client: Client, query: CallbackQuery):
             ]
         )
         btn.insert(0, [
-            InlineKeyboardButton("Sᴛᴀʀᴛ Bᴏᴛ", url=f"https://telegram.me/{temp.U_NAME}"),
-            InlineKeyboardButton("𝐒𝐞𝐧𝐝 𝐀𝐥𝐥", callback_data=f"sendfiles#{key}")
+            InlineKeyboardButton("🚸Hᴏᴡ Tᴏ Dᴏᴡɴʟᴏᴀᴅ🚸", url=settings['tutorial'])
+        ])
+        btn.insert(0, [
+            InlineKeyboardButton("🎬Mᴏᴠɪᴇ Sᴇᴀʀᴄʜ🔎 Gʀᴏᴜᴘ🙋", url=GRP_LNK)
+        ])
+        btn.insert(0, [
+            InlineKeyboardButton("Sᴛᴀʀᴛ Bᴏᴛ", url=f"https://telegram.me/{temp.U_NAME}")
         ])
         
     offset = 0
@@ -1292,34 +1323,76 @@ async def cb_handler(client: Client, query: CallbackQuery):
         _, file_id = lazyData.split(":")
         try:
             user_id = query.from_user.id
-            username =  query.from_user.mention 
+            username =  query.from_user.mention
+            user = query.from_user.id 
 
             log_msg = await client.send_cached_media(
                 chat_id=LOG_CHANNEL,
                 file_id=file_id,
             )
             fileName = {quote_plus(get_name(log_msg))}
-            lazy_stream = f"{URL}watch/{str(log_msg.id)}/{quote_plus(get_name(log_msg))}?hash={get_hash(log_msg)}"
-            lazy_download = f"{URL}{str(log_msg.id)}/{quote_plus(get_name(log_msg))}?hash={get_hash(log_msg)}"
+            settings = await get_settings(log_msg.chat.id)
+            if settings['is_shortlink'] and user not in PREMIUM_USER:
+                lazy_stream = f"{URL}watch/{str(log_msg.id)}/{quote_plus(get_name(log_msg))}?hash={get_hash(log_msg)}"
+                lazy_download = f"{URL}{str(log_msg.id)}/{quote_plus(get_name(log_msg))}?hash={get_hash(log_msg)}"
+                online = await get_shortlink(chat_id=log_msg.chat.id , link=lazy_stream)
+                download = await get_shortlink(chat_id=log_msg.chat.id, link=lazy_download)
 
-            xo = await query.message.reply_text(f'🔐')
-            await asyncio.sleep(1)
-            await xo.delete()
-
-            await log_msg.reply_text(
-                text=f"•• ʟɪɴᴋ ɢᴇɴᴇʀᴀᴛᴇᴅ ꜰᴏʀ ɪᴅ #{user_id} \n•• ᴜꜱᴇʀɴᴀᴍᴇ : {username} \n\n•• ᖴᎥᒪᗴ Nᗩᗰᗴ : {fileName}",
-                quote=True,
-                disable_web_page_preview=True,
-                reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🛡 Fast Download", url=lazy_download),  # we download Link
-                                                    InlineKeyboardButton('▶ Watch online', url=lazy_stream)]])  # web stream Link
-            )
-            await query.message.reply_text(
-                text="•• ʟɪɴᴋ ɢᴇɴᴇʀᴀᴛᴇᴅ ☠︎⚔",
-                quote=True,
-                disable_web_page_preview=True,
-                reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🛡 Fast Download", url=lazy_download),  # we download Link
-                                                    InlineKeyboardButton('▶ Watch online', url=lazy_stream)]])  # web stream Link
-            )
+                await log_msg.reply_text(
+                    text=f"•• ʟɪɴᴋ ɢᴇɴᴇʀᴀᴛᴇᴅ ꜰᴏʀ ɪᴅ #{user_id} \n•• ᴜꜱᴇʀɴᴀᴍᴇ : {username} \n\n•• ᖴᎥᒪᗴ Nᗩᗰᗴ : {fileName}",
+                    quote=True,
+                    disable_web_page_preview=True,
+                    reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🛡 Fast Download", url=download),  # we download Link
+                                                    InlineKeyboardButton('▶ Watch online', url=online)]])  # web stream Link
+                )
+                await query.edit_message_reply_markup(
+                    reply_markup=InlineKeyboardMarkup(
+                        [
+                        [
+                            InlineKeyboardButton("🛡 Fast Download📥", url=download),
+                            InlineKeyboardButton("▶ Watch online🖥️", url=online)
+                        ],[          
+                            InlineKeyboardButton(' Hᴏᴡ Tᴏ Dᴏᴡɴʟᴏᴀᴅ', url= "https://t.me/MrAK_LinkZz/5")
+                        ],[          
+                            InlineKeyboardButton('ᴄʜᴀɴɴᴇʟ', url=CHNL_LNK),
+                            InlineKeyboardButton('ɢʀᴏᴜᴘ', url=GRP_LNK)
+                        ],[
+                            InlineKeyboardButton('𝚆𝚎𝚎𝚔𝚕𝚢 𝚁𝚎𝚕𝚎𝚊𝚜𝚎𝚍 𝙼𝚘𝚟𝚒𝚎𝚜', url=WRM)
+                        ],[
+                            InlineKeyboardButton('❌ ᴄʟᴏsᴇ ❌', callback_data='close_data')
+                        ]
+                        ]
+                    ) 
+                )
+            else:
+                online = f"{URL}watch/{str(log_msg.id)}/{quote_plus(get_name(log_msg))}?hash={get_hash(log_msg)}"
+                download = f"{URL}{str(log_msg.id)}/{quote_plus(get_name(log_msg))}?hash={get_hash(log_msg)}"
+                await log_msg.reply_text(
+                    text=f"•• ʟɪɴᴋ ɢᴇɴᴇʀᴀᴛᴇᴅ ꜰᴏʀ ɪᴅ #{user_id} \n•• ᴜꜱᴇʀɴᴀᴍᴇ : {username} \n\n•• ᖴᎥᒪᗴ Nᗩᗰᗴ : {fileName}",
+                    quote=True,
+                    disable_web_page_preview=True,
+                    reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🛡 Fast Download", url=download),  # we download Link
+                                                    InlineKeyboardButton('▶ Watch online', url=online)]])  # web stream Link
+                )
+                await query.edit_message_reply_markup(
+                    reply_markup=InlineKeyboardMarkup(
+                        [
+                        [
+                            InlineKeyboardButton("🛡 Fast Download📥", url=download),
+                            InlineKeyboardButton("▶ Watch online🖥️", url=online)
+                        ],[          
+                            InlineKeyboardButton(' Hᴏᴡ Tᴏ Dᴏᴡɴʟᴏᴀᴅ', url= "https://t.me/MrAK_LinkZz/5")
+                        ],[          
+                            InlineKeyboardButton('ᴄʜᴀɴɴᴇʟ', url=CHNL_LNK),
+                            InlineKeyboardButton('ɢʀᴏᴜᴘ', url=GRP_LNK)
+                        ],[
+                            InlineKeyboardButton('𝚆𝚎𝚎𝚔𝚕𝚢 𝚁𝚎𝚕𝚎𝚊𝚜𝚎𝚍 𝙼𝚘𝚟𝚒𝚎𝚜', url=WRM)
+                        ],[
+                            InlineKeyboardButton('❌ ᴄʟᴏsᴇ ❌', callback_data='close_data')
+                        ]
+                        ]
+                    ) 
+                )
         except Exception as e:
             print(e)  # print the error message
             await query.answer(f"☣something went wrong sweetheart\n\n{e}", show_alert=True)
@@ -1339,12 +1412,16 @@ async def cb_handler(client: Client, query: CallbackQuery):
         buttons = [[
                     InlineKeyboardButton('⤬ Aᴅᴅ Mᴇ Tᴏ Yᴏᴜʀ Gʀᴏᴜᴘ ⤬', url=f'http://t.me/{temp.U_NAME}?startgroup=true')
                 ],[
-                    InlineKeyboardButton('🦋 𝐂𝐇𝐀𝐍𝐍𝐄𝐋 🦋', url=CHNL_LNK),
-                    InlineKeyboardButton('✨ Mᴏᴠɪᴇ Gʀᴏᴜᴘ ✨', url="https://t.me/movies_hub_official1")
+                    InlineKeyboardButton('🦋 ᴜᴘᴅᴀᴛᴇ 🍂', url=CHNL_LNK),
+                    InlineKeyboardButton('🫨 ᴍᴏᴠɪᴇ ɢʀᴏᴜᴘ ✨', url=GRP_LNK)
                 ],[
-                    InlineKeyboardButton('👻 Hᴇʟᴘ', callback_data='help'),
-                    InlineKeyboardButton('👾 Aʙᴏᴜᴛ', callback_data='about') 
-                  ]]       
+                    InlineKeyboardButton('👻 ʜᴇʟᴘ', callback_data='help'),
+                    InlineKeyboardButton('👾 ᴀʙᴏᴜᴛ', callback_data='about')
+                ],[
+                    InlineKeyboardButton('❤‍🔥 ᴇᴀʀɴ ᴍᴏɴᴇʏ ᴡɪᴛʜ ʙᴏᴛ 💸', callback_data="shortlink_info")
+                  ], [
+                        InlineKeyboardButton('𝚆𝚎𝚎𝚔𝚕𝚢 𝚁𝚎𝚕𝚎𝚊𝚜𝚎𝚍 𝙼𝚘𝚟𝚒𝚎𝚜', url=WRM)
+                    ]]       
         reply_markup = InlineKeyboardMarkup(buttons)
         await client.edit_message_media(
             query.message.chat.id, 
@@ -1397,14 +1474,23 @@ async def cb_handler(client: Client, query: CallbackQuery):
     
     elif query.data == "help":
         buttons = [[
-             InlineKeyboardButton('📁 ꜰɪʟᴇ ꜱᴛᴏʀᴇ 📁', callback_data='store_file'),   
-             InlineKeyboardButton('💠 ᴛᴇʟᴇɢʀᴀᴘʜ 💠', callback_data='tele') 
-         ], [ 
-             InlineKeyboardButton('♻️ ᴄᴏɴɴᴇᴄᴛɪᴏɴꜱ ♻️', callback_data='coct'), 
-             InlineKeyboardButton('❤‍🔥 ᴇᴀʀɴ ᴍᴏɴᴇʏ ❤‍🔥', callback_data='shortlink_info') 
-         ], [ 
-             InlineKeyboardButton('🪩 FILTERS 🪩', callback_data='filters'), 
-             InlineKeyboardButton('🏠 𝙷𝙾𝙼𝙴 🏠', callback_data='start')
+            InlineKeyboardButton('✪ ʙᴏᴛ ꜱᴛᴀᴛᴜꜱ ✪', callback_data='stats')
+        ], [
+            InlineKeyboardButton('🪩 FILTERS 🪩', callback_data='filters'),
+            InlineKeyboardButton('📁 ꜰɪʟᴇ ꜱᴛᴏʀᴇ 📁', callback_data='store_file')
+        ], [
+            InlineKeyboardButton('💠 ᴛᴇʟᴇɢʀᴀᴘʜ 💠', callback_data='tele')
+        ], [
+            InlineKeyboardButton('♻️ ᴄᴏɴɴᴇᴄᴛɪᴏɴꜱ ♻️', callback_data='coct'),
+            InlineKeyboardButton('👽 ᴇxᴛʀᴀ ᴍᴏᴅꜱ 👾', callback_data='extra')
+        ], [
+            InlineKeyboardButton('🆎  ꜰᴏɴᴛ  🆎', callback_data='font')
+        ], [
+            InlineKeyboardButton('🚥 ʀᴜʟᴇꜱ 🚦', callback_data='rule'), 
+            InlineKeyboardButton('⚙️ ꜱᴇᴛᴛɪɴɢꜱ ⚙️', callback_data='settings')
+        ], [
+            InlineKeyboardButton('♻️ ꜱᴛɪᴄᴋᴇʀ ♻️', callback_data='sticker'), 
+            InlineKeyboardButton('🏠 𝙷𝙾𝙼𝙴 🏠', callback_data='start')
         ]]
         reply_markup = InlineKeyboardMarkup(buttons)
         await client.edit_message_media(
@@ -1931,8 +2017,13 @@ async def auto_filter(client, msg, spoll=False):
             ]
         )
         btn.insert(0, [
-            InlineKeyboardButton("Sᴛᴀʀᴛ Bᴏᴛ", url=f"https://telegram.me/{temp.U_NAME}"),
-            InlineKeyboardButton("𝐒𝐞𝐧𝐝 𝐀𝐥𝐥", callback_data=f"sendfiles#{key}")
+            InlineKeyboardButton("🚸Hᴏᴡ Tᴏ Dᴏᴡɴʟᴏᴀᴅ🚸", url=settings['tutorial'])
+        ])
+        btn.insert(0, [
+            InlineKeyboardButton("🎬Mᴏᴠɪᴇ Sᴇᴀʀᴄʜ🔎 Gʀᴏᴜᴘ🙋", url=GRP_LNK)
+        ])
+        btn.insert(0, [
+            InlineKeyboardButton("Sᴛᴀʀᴛ Bᴏᴛ", url=f"https://telegram.me/{temp.U_NAME}")
         ])
     else:
         btn = []
@@ -1944,8 +2035,13 @@ async def auto_filter(client, msg, spoll=False):
             ]
         )
         btn.insert(0, [
-            InlineKeyboardButton("Sᴛᴀʀᴛ Bᴏᴛ", url=f"https://telegram.me/{temp.U_NAME}"),
-            InlineKeyboardButton("𝐒𝐞𝐧𝐝 𝐀𝐥𝐥", callback_data=f"sendfiles#{key}")
+            InlineKeyboardButton("🚸Hᴏᴡ Tᴏ Dᴏᴡɴʟᴏᴀᴅ🚸", url=settings['tutorial'])
+        ])
+        btn.insert(0, [
+            InlineKeyboardButton("🎬Mᴏᴠɪᴇ Sᴇᴀʀᴄʜ🔎 Gʀᴏᴜᴘ🙋", url=GRP_LNK)
+        ])
+        btn.insert(0, [
+            InlineKeyboardButton("Sᴛᴀʀᴛ Bᴏᴛ", url=f"https://telegram.me/{temp.U_NAME}")
         ])
     if offset != "":
         req = message.from_user.id if message.from_user else 0
