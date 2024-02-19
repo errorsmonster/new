@@ -51,7 +51,6 @@ ffmpeg-python>=0.2.0
 ytthumb
 
 jinja2
-python-dotenv<=0.20.0
 apscheduler
 pyshorteners
 psutil
